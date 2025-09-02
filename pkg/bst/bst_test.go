@@ -1,6 +1,9 @@
 package bst
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 type CustomInt int
 
@@ -52,6 +55,26 @@ func TestGetBST(t *testing.T) {
 		Root: &Node[CustomInt, string]{
 			Key:   10,
 			Value: "root",
+			Left: &Node[CustomInt, string]{
+				Key:   5,
+				Value: "left",
+				Left: &Node[CustomInt, string]{
+					Key:   3,
+					Value: "left.left",
+				},
+			},
+			Right: &Node[CustomInt, string]{
+				Key:   15,
+				Value: "right",
+				Left: &Node[CustomInt, string]{
+					Key:   12,
+					Value: "right.left",
+				},
+				Right: &Node[CustomInt, string]{
+					Key:   18,
+					Value: "right.right",
+				},
+			},
 		},
 	}
 	// Get the value for an existing key
@@ -69,4 +92,52 @@ func TestGetBST(t *testing.T) {
 	if !ok {
 		t.Errorf("Expected to get 'root' for key 10")
 	}
+	if value != "root" {
+		t.Errorf("Expected to get 'root' for key 10")
+	}
+
+	value, ok = bst.Get(18)
+	if !ok {
+		t.Errorf("Expected to get 'right.right' for key 18")
+	}
+	if value != "right.right" {
+		t.Errorf("Expected to get 'right.right' for key 18")
+	}
+}
+
+func TestKeys(t *testing.T) {
+	bst := &BST[CustomInt, string]{
+		Root: &Node[CustomInt, string]{
+			Key:   10,
+			Value: "root",
+			Left: &Node[CustomInt, string]{
+				Key:   5,
+				Value: "left",
+				Left: &Node[CustomInt, string]{
+					Key:   3,
+					Value: "left.left",
+				},
+			},
+			Right: &Node[CustomInt, string]{
+				Key:   15,
+				Value: "right",
+				Left: &Node[CustomInt, string]{
+					Key:   12,
+					Value: "right.left",
+				},
+				Right: &Node[CustomInt, string]{
+					Key:   18,
+					Value: "right.right",
+				},
+			},
+		},
+	}
+
+	keys := bst.Keys()
+	expectedKeys := []CustomInt{10, 5, 15, 3, 12, 18}
+
+	if !reflect.DeepEqual(keys, expectedKeys) {
+		t.Errorf("Expected keys %v, but got %v", expectedKeys, keys)
+	}
+
 }

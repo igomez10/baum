@@ -70,7 +70,23 @@ func (b *BST[K, V]) IsEmpty() bool {
 
 // Keys implements SymbolTable.
 func (b *BST[K, V]) Keys() []K {
-	panic("unimplemented")
+	res := []K{}
+	tovisit := []*Node[K, V]{b.Root}
+	currentIdx := 0
+	for currentIdx < len(tovisit) {
+		currentNode := tovisit[currentIdx]
+		res = append(res, currentNode.Key)
+
+		if currentNode.Left != nil {
+			tovisit = append(tovisit, currentNode.Left)
+		}
+		if currentNode.Right != nil {
+			tovisit = append(tovisit, currentNode.Right)
+		}
+		currentIdx++
+	}
+
+	return res
 }
 
 // Put implements SymbolTable.
@@ -80,7 +96,7 @@ func (b *BST[K, V]) Put(key K, value V) {
 
 // Size implements SymbolTable.
 func (b *BST[K, V]) Size() int {
-	panic("unimplemented")
+	return len(b.Keys())
 }
 
 type Node[K Comparable, V any] struct {
