@@ -5,36 +5,6 @@ import (
 	"testing"
 )
 
-type CustomInt int
-
-func (i CustomInt) Equal(a Comparable) bool {
-	return i == a.(CustomInt)
-}
-
-func (i CustomInt) Less(b Comparable) bool {
-	return i < b.(CustomInt)
-}
-
-type CustomString string
-
-func (i CustomString) Equal(a Comparable) bool {
-	return i == a.(CustomString)
-}
-
-func (i CustomString) Less(b Comparable) bool {
-	return i < b.(CustomString)
-}
-
-type CustomFloat float64
-
-func (i CustomFloat) Equal(a Comparable) bool {
-	return i == a.(CustomFloat)
-}
-
-func (i CustomFloat) Less(b Comparable) bool {
-	return i < b.(CustomFloat)
-}
-
 func TestCreateBSTTree(t *testing.T) {
 	// Create a new BST
 	bst := &BST[CustomInt, string]{
@@ -140,4 +110,188 @@ func TestKeys(t *testing.T) {
 		t.Errorf("Expected keys %v, but got %v", expectedKeys, keys)
 	}
 
+}
+
+func TestContains(t *testing.T) {
+	b := &BST[CustomInt, string]{
+		Root: &Node[CustomInt, string]{
+			Key:   10,
+			Value: "root",
+			Left: &Node[CustomInt, string]{
+				Key:   5,
+				Value: "left",
+				Left: &Node[CustomInt, string]{
+					Key:   3,
+					Value: "left.left",
+				},
+			},
+			Right: &Node[CustomInt, string]{
+				Key:   15,
+				Value: "right",
+				Left: &Node[CustomInt, string]{
+					Key:   12,
+					Value: "right.left",
+				},
+				Right: &Node[CustomInt, string]{
+					Key:   18,
+					Value: "right.right",
+				},
+			},
+		},
+	}
+
+	if !b.Contains(10) {
+		t.Errorf("Expected to find key 10")
+	}
+	if b.Contains(20) {
+		t.Errorf("Expected to not find key 20")
+	}
+
+}
+
+func TestPut(t *testing.T) {
+	b := &BST[CustomInt, string]{
+		Root: &Node[CustomInt, string]{
+			Key:   10,
+			Value: "root",
+			Left: &Node[CustomInt, string]{
+				Key:   5,
+				Value: "left",
+				Left: &Node[CustomInt, string]{
+					Key:   3,
+					Value: "left.left",
+				},
+			},
+			Right: &Node[CustomInt, string]{
+				Key:   15,
+				Value: "right",
+				Left: &Node[CustomInt, string]{
+					Key:   12,
+					Value: "right.left",
+				},
+				Right: &Node[CustomInt, string]{
+					Key:   18,
+					Value: "right.right",
+				},
+			},
+		},
+	}
+
+	b.Put(20, "right.right.right")
+	if !b.Contains(20) {
+		t.Errorf("Expected to find key 20")
+	}
+
+	// Check if the new key is present
+	if b.Contains(21) {
+		t.Errorf("Expected to not find key 21")
+	}
+}
+
+func TestBSTStringString_preOrderIterKeys(t *testing.T) {
+	type fields struct {
+		Root *Node[CustomString, CustomString]
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   []CustomString
+	}{
+		{
+			name: "nil root",
+			want: []CustomString{
+				CustomString("10"),
+				CustomString("5"),
+				CustomString("3"),
+				CustomString("7"),
+				CustomString("15"),
+			},
+			fields: fields{
+				Root: &Node[CustomString, CustomString]{
+					Key:   "10",
+					Value: "10",
+					Left: &Node[CustomString, CustomString]{
+						Key:   "5",
+						Value: "5",
+						Left: &Node[CustomString, CustomString]{
+							Key:   "3",
+							Value: "3",
+						},
+						Right: &Node[CustomString, CustomString]{
+							Key:   "7",
+							Value: "7",
+						},
+					},
+					Right: &Node[CustomString, CustomString]{
+						Key:   "15",
+						Value: "15",
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &BSTStringString{
+				Root: tt.fields.Root,
+			}
+			if got := b.preOrderIterKeys(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("BSTStringString.preOrderIterKeys() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestBSTStringString_inorderKeysIter(t *testing.T) {
+	type fields struct {
+		Root *Node[CustomString, CustomString]
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   []CustomString
+	}{
+		{
+			name: "nil root",
+			want: []CustomString{
+				CustomString("3"),
+				CustomString("5"),
+				CustomString("7"),
+				CustomString("10"),
+				CustomString("15"),
+			},
+			fields: fields{
+				Root: &Node[CustomString, CustomString]{
+					Key:   "10",
+					Value: "10",
+					Left: &Node[CustomString, CustomString]{
+						Key:   "5",
+						Value: "5",
+						Left: &Node[CustomString, CustomString]{
+							Key:   "3",
+							Value: "3",
+						},
+						Right: &Node[CustomString, CustomString]{
+							Key:   "7",
+							Value: "7",
+						},
+					},
+					Right: &Node[CustomString, CustomString]{
+						Key:   "15",
+						Value: "15",
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &BSTStringString{
+				Root: tt.fields.Root,
+			}
+			if got := b.inorderKeysIter(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("BSTStringString.inorderKeysIter() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
