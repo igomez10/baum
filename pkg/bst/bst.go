@@ -270,3 +270,47 @@ func (b *BSTStringString) inorderKeysIter() []CustomString {
 
 	return res
 }
+
+func (b *BST[K, V]) validateBtreeAllLeavesHaveSameDepth() bool {
+	// count depth to each leaf and check all are same
+	type LinkedListNode struct {
+		Node       *Node[K, V]
+		Next       *LinkedListNode
+		DepthSoFar int
+	}
+
+	head := &LinkedListNode{
+		Node:       b.Root,
+		DepthSoFar: 0,
+	}
+
+	var leafDepth *int
+	for head != nil {
+		currentNode := head
+		head = head.Next
+		// check if current node is a leaf
+		if currentNode.Node.Left == nil && currentNode.Node.Right == nil {
+			// node is leaf
+			expectedDepth := currentNode.DepthSoFar
+			if leafDepth == nil {
+				leafDepth = &expectedDepth
+			}
+
+			if *leafDepth != expectedDepth {
+				return false
+			}
+		}
+
+		if currentNode.Node.Left != nil {
+			newNode := &LinkedListNode{Node: currentNode.Node.Left, DepthSoFar: currentNode.DepthSoFar + 1, Next: head}
+			head = newNode
+		}
+
+		if currentNode.Node.Right != nil {
+			newNode := &LinkedListNode{Node: currentNode.Node.Right, DepthSoFar: currentNode.DepthSoFar + 1, Next: head}
+			head = newNode
+		}
+	}
+
+	return true
+}

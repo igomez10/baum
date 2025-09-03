@@ -1,6 +1,7 @@
 package bst
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -294,4 +295,80 @@ func TestBSTStringString_inorderKeysIter(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestValidateBtreeAllLeavesHaveSameDepth(t *testing.T) {
+	type testcase struct {
+		Root *Node[Comparable, any]
+		want bool
+	}
+
+	testcases := []testcase{
+		{
+			Root: &Node[Comparable, any]{
+				Key:   CustomString("10"),
+				Value: "10",
+				Left: &Node[Comparable, any]{
+					Key:   CustomString("5"),
+					Value: "5",
+					Left: &Node[Comparable, any]{
+						Key:   CustomString("3"),
+						Value: "3",
+					},
+					Right: &Node[Comparable, any]{
+						Key:   CustomString("7"),
+						Value: "7",
+					},
+				},
+				Right: &Node[Comparable, any]{
+					Key:   CustomString("15"),
+					Value: "15",
+				},
+			},
+			want: false,
+		},
+		{
+			Root: &Node[Comparable, any]{
+				Key:   CustomString("10"),
+				Value: "10",
+				Left: &Node[Comparable, any]{
+					Key:   CustomString("5"),
+					Value: "5",
+					Left: &Node[Comparable, any]{
+						Key:   CustomString("3"),
+						Value: "3",
+					},
+					Right: &Node[Comparable, any]{
+						Key:   CustomString("7"),
+						Value: "7",
+					},
+				},
+				Right: &Node[Comparable, any]{
+					Key:   CustomString("15"),
+					Value: "15",
+					Left: &Node[Comparable, any]{
+						Key:   CustomString("12"),
+						Value: "12",
+					},
+					Right: &Node[Comparable, any]{
+						Key:   CustomString("17"),
+						Value: "17",
+					},
+				},
+			},
+			want: true,
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(fmt.Sprintf("Root=%v", tc.Root.Key), func(t *testing.T) {
+			b := &BST[Comparable, any]{
+				Root: tc.Root,
+			}
+			if got := b.validateBtreeAllLeavesHaveSameDepth(); got != tc.want {
+				t.Errorf("BST[Comparable, any].validateBtreeAllLeavesHaveSameDepth() = %v, want %v", got, tc.want)
+			}
+		})
+	}
+
 }
